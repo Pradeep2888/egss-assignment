@@ -104,10 +104,32 @@ app.post("/user/addtask",async(req,res)=>{
 
 app.get("/user/gettask/:token",async(req,res)=>{ 
     const {token}=req.params
-    const {user_id} = jwt.verify(token, process.env.SECRET_KEY)
+    const {user_id}=await jwt.verify(token, process.env.SECRET_KEY)
     const task=await TaskModel.find({userId:user_id})
-    // console.log(task)
+    // console.log(token,user_id)
     res.send({"data":task})
+})
+
+app.delete("/user/taskdelete/:taskId",async(req,res)=>{ 
+    const {taskId}=req.params
+    const task=await TaskModel.remove({_id:taskId})
+    // console.log(task)
+    res.send({"data":"Item Deleted Successfully"})
+})
+
+app.patch("/user/changestatus/:taskId",async(req,res)=>{ 
+    const {taskId}=req.params
+    const {status}=req.body
+    const task=await TaskModel.updateOne({"_id": taskId}, {$set: {"status": status}})
+    // console.log(status,taskId)
+    res.send({"data":"status Changed"})
+})
+
+app.patch("/user/edittask",async(req,res)=>{ 
+    const {task,taskId}=req.body
+    const newtask=await TaskModel.updateOne({"_id": taskId}, {$set: {"task":task}})
+    // console.log(status,taskId)
+    res.send({"data":"task updated"})
 })
 
 
